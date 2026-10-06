@@ -9,26 +9,65 @@
 <title>Treenikello</title>
 <style>
   :root{
+    --bg:#0a0d12; --g1:#1c2a3f; --g2:#2b1f33;
     --ink:#ffffff;
     --ink-dim:rgba(255,255,255,.72);
     --ink-faint:rgba(255,255,255,.48);
-    --accent:#ffd9a0;
-    --ok:#9fe0b0;
+    --accent:#ffd9a0; --accent-hi:#ffe8c2; --on-accent:#231a0d;
+    --ok:#9fe0b0; --ok-hi:#c8f2d2;
     --warn:#ffb4a0;
     --card:rgba(255,255,255,.055);
+    --field:rgba(255,255,255,.07);
+    --btn:rgba(255,255,255,.1);
+    --btn2:rgba(255,255,255,.14);
+    --track:rgba(255,255,255,.09);
+    --axis:rgba(255,255,255,.18);
     --sheet:#0f141b;
     --line:rgba(255,255,255,.14);
     --grid:rgba(255,255,255,.10);
+    --hdr:rgba(10,13,18,.96); --hdr0:rgba(10,13,18,0);
+    --nav:rgba(10,13,18,.95);
+    --shadow:rgba(0,0,0,.35);
+    --scheme:dark;
   }
+  :root[data-theme="light"]{
+    --bg:#f4f1ea; --g1:#e2eaf4; --g2:#efe5ee;
+    --ink:#141a22;
+    --ink-dim:rgba(20,26,34,.74);
+    --ink-faint:rgba(20,26,34,.6);
+    --ok:#1e7a46; --ok-hi:#1e7a46;
+    --warn:#b3362b;
+    --card:rgba(255,255,255,.72);
+    --field:#ffffff;
+    --btn:rgba(20,26,34,.06);
+    --btn2:rgba(20,26,34,.11);
+    --track:rgba(20,26,34,.09);
+    --axis:rgba(20,26,34,.28);
+    --sheet:#fbfaf7;
+    --line:rgba(20,26,34,.15);
+    --grid:rgba(20,26,34,.10);
+    --hdr:rgba(244,241,234,.96); --hdr0:rgba(244,241,234,0);
+    --nav:rgba(250,248,244,.97);
+    --shadow:transparent;
+    --scheme:light;
+  }
+  .seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+  .seg button{flex:1;background:none;border:none;color:var(--ink-dim);padding:9px 0;border-radius:9px;font-size:14px;cursor:pointer;font-family:inherit}
+  .seg button.on{background:var(--btn2);color:var(--ink);font-weight:500}
+  .swatches{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}
+  .sw{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;color:var(--ink-dim);font-size:11.5px;cursor:pointer;font-family:inherit}
+  .sw i{display:block;width:38px;height:38px;border-radius:50%;border:2px solid var(--line)}
+  .sw.on i{outline:3px solid var(--ink);outline-offset:2px}
+  .sw.on{color:var(--ink);font-weight:500}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
     color:var(--ink);overflow:hidden;
     background:
-      radial-gradient(120% 90% at 20% 0%, #1c2a3f 0%, transparent 55%),
-      radial-gradient(120% 100% at 90% 100%, #2b1f33 0%, transparent 55%),
-      #0a0d12;
+      radial-gradient(120% 90% at 20% 0%, var(--g1) 0%, transparent 55%),
+      radial-gradient(120% 100% at 90% 100%, var(--g2) 0%, transparent 55%),
+      var(--bg);
     background-attachment:fixed;
   }
   button{font-family:inherit}
@@ -39,7 +78,7 @@
     position:fixed;left:0;right:0;top:0;z-index:20;
     padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;
     display:flex;align-items:center;gap:8px;
-    background:linear-gradient(to bottom, rgba(10,13,18,.96) 70%, rgba(10,13,18,0));
+    background:linear-gradient(to bottom, var(--hdr) 70%, var(--hdr0));
   }
   .dnav{display:flex;align-items:center;gap:4px;flex:1;min-width:0}
   .dnav button.ar{width:40px;height:40px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--ink);font-size:20px;cursor:pointer}
@@ -66,7 +105,7 @@
   .hero{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   .hero .big{font-size:clamp(40px,12vw,56px);font-weight:250;line-height:1}
   .hero .of{font-size:16px;color:var(--ink-dim)}
-  .bar{height:8px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden;margin-top:10px}
+  .bar{height:8px;border-radius:999px;background:var(--track);overflow:hidden;margin-top:10px}
   .bar > i{display:block;height:100%;border-radius:999px;background:var(--accent);max-width:100%}
   .bar.over > i{background:var(--warn)}
   .left{font-size:13.5px;color:var(--ink-dim);margin-top:8px}
@@ -79,10 +118,10 @@
 
   .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
   .btn{
-    background:rgba(255,255,255,.1);border:1px solid var(--line);border-radius:12px;
+    background:var(--btn);border:1px solid var(--line);border-radius:12px;
     color:var(--ink);padding:11px 15px;font-size:14.5px;font-weight:500;cursor:pointer;
   }
-  .btn.primary{background:var(--accent);color:#231a0d;border-color:transparent}
+  .btn.primary{background:var(--accent);color:var(--on-accent);border-color:transparent}
   .btn.small{padding:7px 11px;font-size:13px;border-radius:10px}
   .btn.danger{color:var(--warn)}
   .btn.full{width:100%;padding:14px;font-size:16px;margin-top:12px}
@@ -104,7 +143,7 @@
   .wk .t{display:flex;justify-content:space-between;gap:10px;font-size:15px}
   .wk .t b{font-weight:500}
   .wk .d{font-size:13px;color:var(--ink-dim);margin-top:5px;line-height:1.5}
-  .banner{background:rgba(255,217,160,.12);border:1px solid rgba(255,217,160,.4);border-radius:14px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:14px}
+  .banner{background:color-mix(in srgb, var(--accent) 14%, transparent);border:1px solid color-mix(in srgb, var(--accent) 45%, transparent);border-radius:14px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:14px}
   .banner span{flex:1}
 
   /* tabs */
@@ -112,7 +151,7 @@
     position:fixed;left:0;right:0;bottom:0;z-index:20;
     display:flex;justify-content:space-around;
     padding:8px 8px calc(env(safe-area-inset-bottom) + 8px);
-    background:rgba(10,13,18,.95);border-top:1px solid var(--line);backdrop-filter:blur(10px);
+    background:var(--nav);border-top:1px solid var(--line);backdrop-filter:blur(10px);
   }
   nav.tabs button{
     flex:1;background:none;border:none;color:var(--ink-faint);font-size:12px;letter-spacing:.04em;
@@ -137,8 +176,8 @@
   .closex{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--ink-dim);font-size:28px;cursor:pointer;line-height:1;padding:2px 6px}
   label.f{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin:12px 0 5px}
   .sheet input,.sheet select,.sheet textarea{
-    width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:11px;
-    color:var(--ink);padding:11px 12px;font-size:16px;outline:none;min-width:0;color-scheme:dark;font-family:inherit;
+    width:100%;background:var(--field);border:1px solid var(--line);border-radius:11px;
+    color:var(--ink);padding:11px 12px;font-size:16px;outline:none;min-width:0;color-scheme:var(--scheme);font-family:inherit;
   }
   .sheet textarea{min-height:64px;resize:vertical}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -148,7 +187,7 @@
 
   .res{display:flex;flex-direction:column}
   .res .item{padding:11px 2px}
-  .tag{display:inline-block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(255,217,160,.45);border-radius:6px;padding:1px 5px;margin-left:6px;vertical-align:1px}
+  .tag{display:inline-block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid color-mix(in srgb, var(--accent) 50%, transparent);border-radius:6px;padding:1px 5px;margin-left:6px;vertical-align:1px}
   .preview{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;text-align:center}
   .preview div{background:var(--card);border-radius:12px;padding:10px 4px}
   .preview b{display:block;font-size:19px;font-weight:400}
@@ -171,12 +210,9 @@
   .exsum{font-size:12.5px;color:var(--ink-faint);margin-top:8px}
   .rpe{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
   .rpe button{padding:9px 0;border-radius:9px;background:var(--card);border:1px solid var(--line);color:var(--ink);font-size:14px;cursor:pointer}
-  .rpe button.on{background:var(--accent);color:#231a0d;border-color:transparent}
+  .rpe button.on{background:var(--accent);color:var(--on-accent);border-color:transparent}
 
   /* stats */
-  .seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
-  .seg button{flex:1;background:none;border:none;color:var(--ink-dim);padding:8px 0;border-radius:9px;font-size:13.5px;cursor:pointer}
-  .seg button.on{background:rgba(255,255,255,.14);color:var(--ink)}
   .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
   .tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
   .tile .v{font-size:26px;font-weight:300;line-height:1.1}
@@ -186,7 +222,7 @@
   .chart .ttl b{font-size:14.5px;font-weight:500}
   .chart .read{font-size:13px;color:var(--ink-dim);min-height:18px;margin-top:2px}
   .chart svg{display:block;width:100%;height:auto;margin-top:6px;touch-action:pan-y}
-  .chart svg text{fill:rgba(255,255,255,.55);font-size:10px;font-family:inherit}
+  .chart svg text{fill:var(--ink-faint);font-size:10px;font-family:inherit}
   .chart .tbl{margin-top:6px}
   .chart details summary{font-size:12.5px;color:var(--ink-faint);cursor:pointer;margin-top:6px}
   .chart table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
@@ -196,7 +232,7 @@
   .toast{
     position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 92px);
     transform:translateX(-50%) translateY(16px);opacity:0;z-index:80;
-    background:#1b212b;border:1px solid var(--line);
+    background:var(--sheet);border:1px solid var(--line);color:var(--ink);
     padding:10px 18px;border-radius:999px;font-size:14px;pointer-events:none;
     transition:.3s;max-width:90vw;text-align:center;
   }
@@ -276,13 +312,13 @@
     <div class="card chart" id="c_prot"></div>
     <h3>Liikkeen kehitys</h3>
     <div class="card chart">
-      <select id="s_ex" style="width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:11px;color:var(--ink);padding:10px 12px;font-size:15px;color-scheme:dark"></select>
+      <select id="s_ex" style="width:100%;background:var(--field);border:1px solid var(--line);border-radius:11px;color:var(--ink);padding:10px 12px;font-size:15px;color-scheme:var(--scheme)"></select>
       <div id="c_ex"></div>
     </div>
     <h3>Kehon paino</h3>
     <div class="card chart">
       <div style="display:flex;gap:10px;align-items:center">
-        <input id="bw_in" type="text" inputmode="decimal" placeholder="kg" style="flex:1;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:11px;color:var(--ink);padding:10px 12px;font-size:16px;min-width:0">
+        <input id="bw_in" type="text" inputmode="decimal" placeholder="kg" style="flex:1;background:var(--field);border:1px solid var(--line);border-radius:11px;color:var(--ink);padding:10px 12px;font-size:16px;min-width:0">
         <button class="btn" id="bw_save">Tallenna päivälle</button>
       </div>
       <div id="c_bw"></div>
@@ -428,6 +464,13 @@
   <input type="file" id="bk_file" accept="application/json,.json" style="display:none">
   <div class="hint">Kaikki tiedot ovat vain tässä puhelimessa. Tee varmuuskopio esimerkiksi kerran kuussa ja tallenna se pilveen. Palautus korvaa nykyiset tiedot.</div>
   <div class="hint" id="st_store"></div>
+  <h2 style="margin-top:26px">Ulkoasu</h2>
+  <div class="seg" id="th_mode" role="group" aria-label="Teema">
+    <button data-m="dark">Tumma</button><button data-m="light">Vaalea</button><button data-m="auto">Automaattinen</button>
+  </div>
+  <div class="hint">Automaattinen seuraa puhelimen tummaa / vaaleaa tilaa.</div>
+  <div class="swatches" id="th_acc" role="group" aria-label="Korostusväri"></div>
+
   <div class="hint" style="margin-top:14px">Ravintoarvot: Fineli – elintarvikkeiden koostumustietopankki, Terveyden ja hyvinvoinnin laitos (THL), avoin data CC BY 4.0, versio 18. THL ei vastaa tietojen virheistä.</div>
 </div></div>
 
@@ -1124,16 +1167,16 @@ function barChart(el, data, goal, unit, title){
   const ih = H - top - bot, step = (CW - left - right) / data.length, bw = Math.max(3, Math.min(22, step - 2));
   const y = v => top + ih - v / max * ih;
   let s = "<svg viewBox='0 0 " + CW + " " + H + "' role='img' aria-label='" + esc(title) + "'>";
-  s += "<line x1='0' x2='" + CW + "' y1='" + (top + ih) + "' y2='" + (top + ih) + "' stroke='rgba(255,255,255,.18)' stroke-width='1'/>";
+  s += "<line x1='0' x2='" + CW + "' y1='" + (top + ih) + "' y2='" + (top + ih) + "' style='stroke:var(--axis)' stroke-width='1'/>";
   if (goal > 0){
-    s += "<line x1='0' x2='" + CW + "' y1='" + y(goal) + "' y2='" + y(goal) + "' stroke='rgba(255,255,255,.45)' stroke-width='1' stroke-dasharray='4 4'/>";
+    s += "<line x1='0' x2='" + CW + "' y1='" + y(goal) + "' y2='" + y(goal) + "' style='stroke:var(--ink-faint)' stroke-width='1' stroke-dasharray='4 4'/>";
     s += "<text x='" + (CW - 2) + "' y='" + (y(goal) - 4) + "' text-anchor='end'>tavoite " + f0(goal) + "</text>";
   }
   data.forEach((x, k) => {
     const cx = left + step * k + step / 2;
     if (x.v > 0){
       const h = Math.max(2, top + ih - y(x.v)), x0 = cx - bw / 2, y0 = top + ih - h, r = Math.min(4, bw / 2, h);
-      s += "<path d='M" + x0 + "," + (top + ih) + " V" + (y0 + r) + " Q" + x0 + "," + y0 + " " + (x0 + r) + "," + y0 + " H" + (x0 + bw - r) + " Q" + (x0 + bw) + "," + y0 + " " + (x0 + bw) + "," + (y0 + r) + " V" + (top + ih) + " Z' fill='#ffd9a0' data-k='" + k + "' class='mk'/>";
+      s += "<path d='M" + x0 + "," + (top + ih) + " V" + (y0 + r) + " Q" + x0 + "," + y0 + " " + (x0 + r) + "," + y0 + " H" + (x0 + bw - r) + " Q" + (x0 + bw) + "," + y0 + " " + (x0 + bw) + "," + (y0 + r) + " V" + (top + ih) + " Z' style='fill:var(--accent)' data-k='" + k + "' class='mk'/>";
     }
     const every = data.length <= 7 ? 1 : data.length <= 14 ? 2 : 5;
     if ((data.length - 1 - k) % every === 0) s += "<text x='" + cx + "' y='" + (H - 6) + "' text-anchor='middle'>" + shortD(x.d) + "</text>";
@@ -1157,10 +1200,10 @@ function lineChart(el, pts, unit, title, emptyMsg){
   const x = k => pts.length === 1 ? left + iw / 2 : left + iw * k / (pts.length - 1);
   const y = v => top + ih - (v - lo) / (hi - lo) * ih;
   let s = "<svg viewBox='0 0 " + CW + " " + H + "' role='img' aria-label='" + esc(title) + "'>";
-  s += "<line x1='0' x2='" + CW + "' y1='" + (top + ih) + "' y2='" + (top + ih) + "' stroke='rgba(255,255,255,.18)'/>";
+  s += "<line x1='0' x2='" + CW + "' y1='" + (top + ih) + "' y2='" + (top + ih) + "' style='stroke:var(--axis)'/>";
   s += "<text x='" + (left - 8) + "' y='" + (top + 4) + "' text-anchor='end'>" + f0(hi) + "</text><text x='" + (left - 8) + "' y='" + (top + ih) + "' text-anchor='end'>" + f0(lo) + "</text><text x='" + (left - 8) + "' y='" + (top + ih / 2 + 3) + "' text-anchor='end'>" + unit + "</text>";
-  if (pts.length > 1) s += "<polyline fill='none' stroke='#ffd9a0' stroke-width='2' stroke-linejoin='round' stroke-linecap='round' points='" + pts.map((p, k) => x(k) + "," + y(p.v)).join(" ") + "'/>";
-  pts.forEach((p, k) => { s += "<circle cx='" + x(k) + "' cy='" + y(p.v) + "' r='4' fill='#ffd9a0' stroke='#0f141b' stroke-width='2'/>"; });
+  if (pts.length > 1) s += "<polyline fill='none' style='stroke:var(--accent)' stroke-width='2' stroke-linejoin='round' stroke-linecap='round' points='" + pts.map((p, k) => x(k) + "," + y(p.v)).join(" ") + "'/>";
+  pts.forEach((p, k) => { s += "<circle cx='" + x(k) + "' cy='" + y(p.v) + "' r='4' style='fill:var(--accent);stroke:var(--sheet)' stroke-width='2'/>"; });
   s += "<text x='" + x(0) + "' y='" + (H - 6) + "' text-anchor='start'>" + shortD(pts[0].d) + "</text>";
   if (pts.length > 1) s += "<text x='" + x(pts.length - 1) + "' y='" + (H - 6) + "' text-anchor='end'>" + shortD(pts[pts.length - 1].d) + "</text>";
   const step = pts.length === 1 ? iw : iw / (pts.length - 1);
@@ -1236,6 +1279,54 @@ function restoreBackup(o){
   buildFoods();
   return (o.wk || []).length;
 }
+
+
+/* ================= theme (dark / light / auto + accent) ================= */
+const ACCENTS = {
+  keltainen:{name:"Kulta", d:["#ffd9a0","#ffe8c2","#231a0d"], l:["#8a5a1c","#8a5a1c","#ffffff"]},
+  sininen:  {name:"Sininen",   d:["#a8cbff","#cfe1ff","#0d1a2e"], l:["#1f5fbf","#1f5fbf","#ffffff"]},
+  vihrea:   {name:"Vihreä",    d:["#9fe0b0","#c8f2d2","#0f2416"], l:["#1e7a46","#1e7a46","#ffffff"]},
+  punainen: {name:"Punainen",  d:["#ffb0a8","#ffd3cd","#2e0f0d"], l:["#b3362b","#b3362b","#ffffff"]},
+  violetti: {name:"Violetti",  d:["#d4b8ff","#e6d6ff","#1e1030"], l:["#6a3fb5","#6a3fb5","#ffffff"]}
+};
+function themeCfg(){ return Object.assign({mode:"dark", accent:"keltainen"}, LS.get("theme", {})); }
+const darkMQ = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+function applyTheme(){
+  const t = themeCfg();
+  const dark = t.mode === "dark" || (t.mode === "auto" && (!darkMQ || darkMQ.matches));
+  const root = document.documentElement;
+  root.dataset.theme = dark ? "dark" : "light";
+  const a = (ACCENTS[t.accent] || ACCENTS.keltainen)[dark ? "d" : "l"];
+  root.style.setProperty("--accent", a[0]);
+  root.style.setProperty("--accent-hi", a[1]);
+  root.style.setProperty("--on-accent", a[2]);
+  const m = document.querySelector("meta[name='theme-color']");
+  if (m) m.setAttribute("content", dark ? "#0a0d12" : "#f4f1ea");
+  renderThemeUI();
+}
+function renderThemeUI(){
+  const t = themeCfg(), mode = document.getElementById("th_mode"), acc = document.getElementById("th_acc");
+  if (!mode || !acc) return;
+  mode.querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.m === t.mode));
+  const dark = document.documentElement.dataset.theme !== "light";
+  acc.innerHTML = Object.keys(ACCENTS).map(k => "<button class='sw" + (k === t.accent ? " on" : "") + "' data-a='" + k + "' aria-label='" + ACCENTS[k].name +
+    "' aria-pressed='" + (k === t.accent) + "'><i style='background:" + ACCENTS[k][dark ? "d" : "l"][0] + "'></i>" + ACCENTS[k].name + "</button>").join("");
+}
+function wireTheme(){
+  document.getElementById("th_mode").addEventListener("click", e => {
+    const b = e.target.closest("[data-m]"); if (!b) return;
+    const t = themeCfg(); t.mode = b.dataset.m; LS.set("theme", t); applyTheme();
+  });
+  document.getElementById("th_acc").addEventListener("click", e => {
+    const b = e.target.closest("[data-a]"); if (!b) return;
+    const t = themeCfg(); t.accent = b.dataset.a; LS.set("theme", t); applyTheme();
+  });
+  if (darkMQ){
+    const h = () => { if (themeCfg().mode === "auto") applyTheme(); };
+    if (darkMQ.addEventListener) darkMQ.addEventListener("change", h); else if (darkMQ.addListener) darkMQ.addListener(h);
+  }
+}
+applyTheme();
 
 /* ================= wiring ================= */
 function wire(){
@@ -1357,6 +1448,7 @@ function openGymExisting(w){
 (function init(){
   buildFoods();
   wire();
+  wireTheme();
   render();
   setInterval(() => { const t = todayStr(); if (S._t && S._t !== t && S.date === S._t){ S.date = t; render(); } S._t = t; }, 60000);
   try{ if (navigator.storage && navigator.storage.persist) navigator.storage.persist().then(ok => { $("st_store").textContent = ok ? "Selain suojaa tiedot automaattiselta poistolta." : ""; }); }catch(e){}
