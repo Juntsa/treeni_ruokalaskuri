@@ -133,7 +133,7 @@
   .item{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--grid);cursor:pointer}
   .item:first-of-type{border-top:none}
   .item .nm{flex:1;min-width:0;font-size:14.5px}
-  .item .nm small{display:block;color:var(--ink-faint);font-size:12.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .item .nm small{display:block;color:var(--ink-faint);font-size:12.5px;margin-top:2px;line-height:1.45}
   .item .kc{font-size:14px;color:var(--ink-dim);flex:0 0 auto}
   .mealh{display:flex;align-items:center;justify-content:space-between;gap:10px}
   .mealh b{font-size:15.5px;font-weight:500}
@@ -356,8 +356,10 @@
     <div><label class="f" for="am_cnt">Määrä</label><input id="am_cnt" type="text" inputmode="decimal" value="1"></div>
     <div><label class="f" for="am_unit">Yksikkö</label><select id="am_unit"></select></div>
   </div>
-  <label class="f" for="am_meal">Ateria</label>
-  <select id="am_meal"></select>
+  <div class="grid2">
+    <div><label class="f" for="am_meal">Ateria</label><select id="am_meal"></select></div>
+    <div><label class="f" for="am_time">Kellonaika</label><input id="am_time" type="time"></div>
+  </div>
   <div class="preview" id="am_prev"></div>
   <div class="err" id="am_err"></div>
   <button class="btn primary full" id="am_ok">Lisää</button>
@@ -570,6 +572,11 @@ function dayTotals(d){
   return t;
 }
 const MEALS = ["Aamupala", "Lounas", "Välipala", "Päivällinen", "Iltapala"];
+const MEAL_TIME = {"Aamupala":"07:30", "Lounas":"11:30", "Välipala":"14:30", "Päivällinen":"17:30", "Iltapala":"20:30"};
+function nowHM(){ const d = new Date(); return pad(d.getHours()) + ":" + pad(d.getMinutes()); }
+function defaultTime(date, meal){ return date === todayStr() ? nowHM() : (MEAL_TIME[meal] || "12:00"); }
+const tLabel = t => t ? t.replace(":", ".") : "";
+const byTime = (a, b) => (a.time || "99:99") < (b.time || "99:99") ? -1 : (a.time || "99:99") > (b.time || "99:99") ? 1 : 0;
 function defaultMeal(){
   const h = new Date().getHours();
   return h < 10 ? "Aamupala" : h < 14 ? "Lounas" : h < 17 ? "Välipala" : h < 20 ? "Päivällinen" : "Iltapala";
@@ -710,7 +717,8 @@ function renderToday(){
     const it = food.filter(e => e.meal === m);
     if (!it.length) return "";
     const k = it.reduce((s, e) => s + entryVal(e, 0), 0);
-    return "<div class='item' data-act='gofood'><div class='nm'>" + m + "<small>" + esc(it.map(e => e.name.split(",")[0]).join(", ")) + "</small></div><div class='kc num'>" + f0(k) + " kcal</div></div>";
+    const tt = it.map(e => e.time).filter(Boolean).sort();
+    return "<div class='item' data-act='gofood'><div class='nm'>" + m + (tt.length ? " <span class='faint num' style='font-size:13px'>" + tLabel(tt[0]) + "</span>" : "") + "<small>" + esc(it.map(e => e.name.split(",")[0]).join(", ")) + "</small></div><div class='kc num'>" + f0(k) + " kcal</div></div>";
   }).join("") || "<div class='empty'>Ei aterioita. Lisää ruoka yläpuolelta.</div>";
 }
 function wkCard(w){
@@ -960,12 +968,12 @@ function renderFood(){
   kcalBlock(t, c, "f");
   const yday = dayFood(addDays(S.date, -1));
   $("f_meals").innerHTML = MEALS.map(m => {
-    const it = food.filter(e => e.meal === m);
+    const it = food.filter(e => e.meal === m).sort(byTime);
     const k = it.reduce((s, e) => s + entryVal(e, 0), 0);
     let h = "<h3>" + m + "</h3><div class='card'><div class='mealh'><b class='num'>" + (it.length ? f0(k) + " kcal" : "") + "</b>" +
       "<button class='btn small primary' data-addmeal='" + m + "'>+ Lisää</button></div>";
     h += it.map(e => "<div class='item' data-entry='" + e.id + "'><div class='nm'>" + esc(e.name) +
-      "<small class='num'>" + esc(amountLabel(e)) + " · P " + f0(entryVal(e, 1)) + " g · HH " + f0(entryVal(e, 2)) + " g · R " + f0(entryVal(e, 3)) + " g</small></div>" +
+      "<small class='num'>" + (e.time ? tLabel(e.time) + " · " : "") + esc(amountLabel(e)) + " · P " + f0(entryVal(e, 1)) + " g · HH " + f0(entryVal(e, 2)) + " g · R " + f0(entryVal(e, 3)) + " g</small></div>" +
       "<div class='kc num'>" + f0(entryVal(e, 0)) + " kcal</div></div>").join("");
     const acts = [];
     if (!it.length && yday.some(e => e.meal === m)) acts.push("<button class='link' data-copy='" + m + "'>Kopioi eilisestä</button>");
@@ -1033,6 +1041,7 @@ function openAmount(food, entry){
   else if (units.some(u => u[0] === "PORTM")){ $("am_unit").value = "PORTM"; $("am_cnt").value = "1"; }
   else { $("am_unit").value = "g"; $("am_cnt").value = "100"; }
   $("am_meal").value = pre && pre.meal && AM.entry ? pre.meal : FS.meal;
+  $("am_time").value = AM.entry ? (AM.entry.time || "") : defaultTime(AM.date, $("am_meal").value);
   $("am_ok").textContent = AM.entry ? "Tallenna" : "Lisää";
   $("am_del").style.display = AM.entry ? "block" : "none";
   $("am_err").textContent = "";
@@ -1056,9 +1065,11 @@ function amSave(){
   const g = amGrams();
   if (!(g > 0) || g > 5000){ $("am_err").textContent = "Anna määrä (esim. 1 annos tai 150 g)."; return; }
   const u = $("am_unit").value, cnt = num($("am_cnt").value);
+  const time = $("am_time").value;
+  if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)){ $("am_err").textContent = "Tarkista kellonaika."; return; }
   const arr = dayFood(AM.date).slice();
   const e = {id: AM.entry ? AM.entry.id : uid(), meal:$("am_meal").value, name:AM.food.name, ref:AM.food.id || null,
-    per:AM.food.per.slice(0, 7), units:AM.food.units || [], g:Math.round(g * 10) / 10, unit:u, cnt:u === "g" ? g : cnt};
+    per:AM.food.per.slice(0, 7), units:AM.food.units || [], g:Math.round(g * 10) / 10, unit:u, cnt:u === "g" ? g : cnt, time:time || ""};
   const i = arr.findIndex(x => x.id === e.id);
   if (i >= 0) arr[i] = e; else arr.push(e);
   setDayFood(AM.date, arr);
@@ -1090,7 +1101,8 @@ function saveMeal(meal){
 }
 function addSavedMeal(id){
   const m = LS.get("meals", []).find(x => x.id === id); if (!m) return;
-  const arr = dayFood(S.date).concat(m.items.map(e => Object.assign({}, e, {id:uid(), meal:$("fs_meal").value})));
+  const meal = $("fs_meal").value, time = defaultTime(S.date, meal);
+  const arr = dayFood(S.date).concat(m.items.map(e => Object.assign({}, e, {id:uid(), meal, time})));
   setDayFood(S.date, arr); closeAll(); toast(m.name + " lisätty");
 }
 /* own food */
@@ -1258,9 +1270,9 @@ function wkCsv(){
   return toCsv(rows);
 }
 function foodCsv(){
-  const rows = [["Päivä","Ateria","Ruoka","Määrä","Grammat","kcal","Proteiini g","Hiilihydraatit g","Rasva g","Kuitu g","Sokerit g","Suola g"]];
+  const rows = [["Päivä","Kellonaika","Ateria","Ruoka","Määrä","Grammat","kcal","Proteiini g","Hiilihydraatit g","Rasva g","Kuitu g","Sokerit g","Suola g"]];
   const all = getFood();
-  Object.keys(all).sort().forEach(d => all[d].forEach(e => rows.push([d, e.meal, e.name, amountLabel(e), dec(e.g),
+  Object.keys(all).sort().forEach(d => all[d].slice().sort(byTime).forEach(e => rows.push([d, tLabel(e.time), e.meal, e.name, amountLabel(e), dec(e.g),
     Math.round(entryVal(e, 0)), dec(entryVal(e, 1)), dec(entryVal(e, 2)), dec(entryVal(e, 3)), dec(entryVal(e, 4)), dec(entryVal(e, 5)), dec(entryVal(e, 6))])));
   return toCsv(rows);
 }
@@ -1376,6 +1388,10 @@ function wire(){
   $("fs_own").addEventListener("click", openOwn);
   $("of_ok").addEventListener("click", saveOwn);
   ["am_cnt"].forEach(k => $(k).addEventListener("input", amPreview));
+  $("am_time").addEventListener("input", () => { if (AM) AM.timeTouched = true; });
+  $("am_meal").addEventListener("change", () => {
+    if (AM && !AM.entry && !AM.timeTouched && AM.date !== todayStr()) $("am_time").value = defaultTime(AM.date, $("am_meal").value);
+  });
   $("am_unit").addEventListener("change", () => {
     const u = $("am_unit").value; $("am_cnt").value = u === "g" ? "100" : "1"; amPreview();
   });
